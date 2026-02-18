@@ -1,15 +1,20 @@
 
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { AssessmentData } from "../types";
 
-// Always use process.env.API_KEY directly and use a named parameter object.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+let ai: GoogleGenAI | null = null;
+
+function getAI(): GoogleGenAI {
+  if (!ai) {
+    const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY || '';
+    ai = new GoogleGenAI({ apiKey });
+  }
+  return ai;
+}
 
 export const getClarityInsight = async (data: AssessmentData) => {
-  // Cast Object.values to number[] to resolve 'unknown' comparison issues.
   const auditValues = Object.values(data.audit) as number[];
   const yesCount = data.patterns.filter(p => p).length;
-  // Cast Object.entries to [string, number][] to resolve 'unknown' comparison issues.
   const lowAuditScores = (Object.entries(data.audit) as [string, number][])
     .filter(([_, val]) => val <= 2)
     .map(([key, _]) => key);
@@ -28,15 +33,14 @@ export const getClarityInsight = async (data: AssessmentData) => {
   `;
 
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+    const response = await getAI().models.generateContent({
+      model: 'gemini-2.0-flash',
       contents: prompt,
       config: {
         temperature: 0.7,
         topP: 0.9,
       }
     });
-    // Access response.text directly (property access, not method call).
     return response.text;
   } catch (error) {
     console.error("Error generating insight:", error);
