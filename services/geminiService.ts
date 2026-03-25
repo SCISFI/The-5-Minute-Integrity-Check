@@ -1,7 +1,15 @@
 import { GoogleGenAI } from "@google/genai";
 import { AssessmentData } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
+let ai: GoogleGenAI | null = null;
+
+function getAI(): GoogleGenAI {
+  if (!ai) {
+    const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY || '';
+    ai = new GoogleGenAI({ apiKey });
+  }
+  return ai;
+}
 
 export const getClarityInsight = async (data: AssessmentData) => {
   const auditValues = Object.values(data.audit) as number[];
@@ -24,7 +32,7 @@ export const getClarityInsight = async (data: AssessmentData) => {
   `;
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: 'gemini-2.0-flash',
       contents: prompt,
       config: {
