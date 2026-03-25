@@ -12,6 +12,7 @@ const STEPS = [AppState.INTRO, AppState.PATTERN, AppState.AUDIT, AppState.PIVOT]
 const App: React.FC = () => {
   const [currentState, setCurrentState] = useState<AppState>(AppState.LANDING);
   const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
   const [data, setData] = useState<AssessmentData>({
     patterns: new Array(8).fill(false),
     audit: {
@@ -72,7 +73,7 @@ const App: React.FC = () => {
         )}
 
         {currentState === AppState.LANDING && (
-          <Landing onStart={(e) => { setEmail(e); next(); }} />
+          <Landing onStart={(e, fn) => { setEmail(e); setFirstName(fn); next(); }} />
         )}
         {currentState === AppState.INTRO && <Intro onNext={next} />}
         {currentState === AppState.PATTERN && (
@@ -99,7 +100,7 @@ const App: React.FC = () => {
             onBack={back}
           />
         )}
-        {currentState === AppState.RESULT && <FinalCTA data={data} email={email} />}
+        {currentState === AppState.RESULT && <FinalCTA data={data} email={email} firstName={firstName} />}
       </div>
 
       <footer className="mt-8 text-center text-xs text-gray-400 uppercase tracking-widest space-y-2">

@@ -2,23 +2,24 @@ import React, { useState } from 'react';
 import { captureEmail } from '../services/emailService';
 
 interface Props {
-  onStart: (email: string) => void;
+  onStart: (email: string, firstName: string) => void;
 }
 
 const Landing: React.FC<Props> = ({ onStart }) => {
   const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await captureEmail(email);
+      await captureEmail(email, firstName);
     } catch {
       // Non-blocking — proceed even if capture fails
     } finally {
       setLoading(false);
-      onStart(email);
+      onStart(email, firstName);
     }
   };
 
@@ -42,6 +43,20 @@ const Landing: React.FC<Props> = ({ onStart }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="firstName" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+              First Name
+            </label>
+            <input
+              type="text"
+              id="firstName"
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded focus:ring-1 focus:ring-black focus:border-black outline-none transition-all"
+              placeholder="Your first name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+          </div>
           <div>
             <label htmlFor="email" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
               Corporate or Private Email
