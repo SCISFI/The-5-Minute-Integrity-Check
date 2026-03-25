@@ -1,21 +1,25 @@
-
 import React, { useState } from 'react';
+import { captureEmail } from '../services/emailService';
 
 interface Props {
-  onStart: () => void;
+  onStart: (email: string) => void;
 }
 
 const Landing: React.FC<Props> = ({ onStart }) => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Simulate capture and start
-    setTimeout(() => {
-      onStart();
-    }, 800);
+    try {
+      await captureEmail(email);
+    } catch {
+      // Non-blocking — proceed even if capture fails
+    } finally {
+      setLoading(false);
+      onStart(email);
+    }
   };
 
   return (

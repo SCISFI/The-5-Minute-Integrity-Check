@@ -1,4 +1,3 @@
-
 export interface AssessmentData {
   patterns: boolean[];
   audit: {
@@ -10,7 +9,6 @@ export interface AssessmentData {
   pivot: {
     cost: string;
     risk: string;
-    shape: string;
     change: string;
   };
 }

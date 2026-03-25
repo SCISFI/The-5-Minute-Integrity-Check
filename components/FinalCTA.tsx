@@ -1,13 +1,13 @@
-
 import React, { useEffect, useState } from 'react';
 import { AssessmentData } from '../types';
 import { getClarityInsight } from '../services/geminiService';
 
 interface Props {
   data: AssessmentData;
+  email: string;
 }
 
-const FinalCTA: React.FC<Props> = ({ data }) => {
+const FinalCTA: React.FC<Props> = ({ data, email }) => {
   const [insight, setInsight] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -15,9 +15,9 @@ const FinalCTA: React.FC<Props> = ({ data }) => {
     const fetchInsight = async () => {
       try {
         const text = await getClarityInsight(data);
-        setInsight(text || "Clarity achieved. Review your path forward.");
+        setInsight(text || 'Clarity achieved. Review your path forward.');
       } catch (e) {
-        setInsight("Review your audit results to identify your vulnerability vectors.");
+        setInsight('Review your audit results to identify your vulnerability vectors.');
       } finally {
         setLoading(false);
       }
@@ -26,10 +26,23 @@ const FinalCTA: React.FC<Props> = ({ data }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Fix: Explicitly cast Object.entries to [string, number][] to prevent 'unknown' comparison error.
   const lowAuditKeys = (Object.entries(data.audit) as [string, number][])
-    .filter(([_, v]) => v <= 2)
+    .filter(([_, v]) => v >= 0 && v <= 2)
     .map(([k]) => k.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()));
+
+  const mailtoBody = [
+    `Your 5-Minute Integrity Check Results`,
+    ``,
+    `Coping Indicators: ${data.patterns.filter(p => p).length} / 8`,
+    `Primary Vulnerability: ${lowAuditKeys.length > 0 ? lowAuditKeys[0] : 'None Detected'}`,
+    ``,
+    `Clarity Memo:`,
+    insight ?? 'Loading...',
+    ``,
+    `Next step: https://integrity.scifsi.com/`,
+  ].join('\n');
+
+  const mailtoLink = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent('Your 5-Minute Integrity Check Results')}&body=${encodeURIComponent(mailtoBody)}`;
 
   return (
     <div className="space-y-10 animate-in fade-in duration-700">
@@ -48,7 +61,7 @@ const FinalCTA: React.FC<Props> = ({ data }) => {
             </div>
           ) : (
             <div className="prose prose-sm text-gray-700 leading-relaxed font-serif italic text-lg">
-              "{insight}"
+              &ldquo;{insight}&rdquo;
             </div>
           )}
         </div>
@@ -71,13 +84,13 @@ const FinalCTA: React.FC<Props> = ({ data }) => {
 
       <div className="space-y-6 border-t border-gray-100 pt-10">
         <div className="space-y-4 text-center">
-          <h3 className="text-2xl font-bold">You don’t need motivation.</h3>
+          <h3 className="text-2xl font-bold">You don&apos;t need motivation.</h3>
           <p className="text-xl font-light text-gray-600">You need structure.</p>
         </div>
 
         <div className="text-sm text-gray-600 space-y-4 leading-relaxed bg-black/5 p-6 rounded-lg text-center">
           <p>
-            The <strong>Integrity Protocol</strong> is not therapy. It is a structured weekly system 
+            The <strong>Integrity Protocol</strong> is not therapy. It is a structured weekly system
             designed specifically for professionals who use sexual behavior as a coping mechanism.
           </p>
           <p className="font-bold text-black uppercase tracking-tighter text-lg">Week 1 is free.</p>
@@ -91,6 +104,15 @@ const FinalCTA: React.FC<Props> = ({ data }) => {
         >
           Enter the Protocol →
         </a>
+
+        {email && !loading && (
+          <a
+            href={mailtoLink}
+            className="block w-full border border-gray-300 text-gray-700 text-center py-4 font-medium text-sm tracking-widest uppercase hover:border-black hover:text-black transition-all"
+          >
+            Email These Results to Myself
+          </a>
+        )}
 
         <p className="text-center text-[10px] text-gray-400 uppercase tracking-[0.2em] pt-4">
           Strictly Confidential • No data persistent after session close

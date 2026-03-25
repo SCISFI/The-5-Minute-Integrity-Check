@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { AssessmentData } from '../types';
 
@@ -21,8 +20,9 @@ const LonelinessAudit: React.FC<Props> = ({ data, onChange, onNext, onBack }) =>
     onChange({ ...data, [id]: score });
   };
 
-  // Fix: Explicitly cast Object.values to number[] to prevent 'unknown' comparison error.
-  const hasVulnerability = (Object.values(data) as number[]).some(v => v > 0 && v <= 2);
+  // Scores initialise at -1 (unrated). Once a user rates a category >= 0,
+  // a score of 0–2 is considered a vulnerability vector.
+  const hasVulnerability = (Object.values(data) as number[]).some(v => v >= 0 && v <= 2);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -62,7 +62,7 @@ const LonelinessAudit: React.FC<Props> = ({ data, onChange, onNext, onBack }) =>
         <div className="bg-gray-100 p-6 rounded-sm space-y-2">
           <p className="text-xs uppercase tracking-widest font-bold text-gray-400 italic">Finding</p>
           <p className="text-sm text-gray-700 leading-relaxed">
-            Categories rated 2 or below represent your <span className="font-bold">vulnerability vector</span>. 
+            Categories rated 2 or below represent your <span className="font-bold">vulnerability vector</span>.
             Behavior follows isolation.
           </p>
         </div>
