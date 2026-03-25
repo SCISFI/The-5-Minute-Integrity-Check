@@ -39,7 +39,7 @@ const FinalCTA: React.FC<Props> = ({ data, email }) => {
     `Clarity Memo:`,
     insight ?? 'Loading...',
     ``,
-    `Next step: https://integrity.scifsi.com/`,
+    `Next step: https://integrity.scisfi.com/`,
   ].join('\n');
 
   const mailtoLink = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent('Your 5-Minute Integrity Check Results')}&body=${encodeURIComponent(mailtoBody)}`;
@@ -97,7 +97,7 @@ const FinalCTA: React.FC<Props> = ({ data, email }) => {
         </div>
 
         <a
-          href="https://integrity.scifsi.com/"
+          href="https://integrity.scisfi.com/"
           target="_blank"
           rel="noopener noreferrer"
           className="block w-full bg-black text-white text-center py-6 font-bold text-xl tracking-widest uppercase hover:bg-gray-800 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 active:translate-y-0"
