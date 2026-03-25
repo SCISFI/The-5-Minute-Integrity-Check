@@ -1,23 +1,36 @@
-
 import React, { useEffect, useState } from 'react';
 import { AssessmentData } from '../types';
 import { getClarityInsight } from '../services/geminiService';
+import { sendCompletionData, requestResultsEmail } from '../services/emailService';
 
 interface Props {
   data: AssessmentData;
+  email: string;
+  firstName: string;
 }
 
-const FinalCTA: React.FC<Props> = ({ data }) => {
+const FinalCTA: React.FC<Props> = ({ data, email, firstName }) => {
   const [insight, setInsight] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [resultsSent, setResultsSent] = useState(false);
+  const [resultsSending, setResultsSending] = useState(false);
+
+  const lowAuditKeys = (Object.entries(data.audit) as [string, number][])
+    .filter(([_, v]) => v >= 0 && v <= 2)
+    .map(([k]) => k.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()));
 
   useEffect(() => {
     const fetchInsight = async () => {
       try {
         const text = await getClarityInsight(data);
-        setInsight(text || "Clarity achieved. Review your path forward.");
+        const memo = text || 'Clarity achieved. Review your path forward.';
+        setInsight(memo);
+        // Fire completion event with full assessment data for CRM segmentation
+        sendCompletionData(email, firstName, data, memo).catch(() => {});
       } catch (e) {
-        setInsight("Review your audit results to identify your vulnerability vectors.");
+        const fallback = 'Review your audit results to identify your vulnerability vectors.';
+        setInsight(fallback);
+        sendCompletionData(email, firstName, data, fallback).catch(() => {});
       } finally {
         setLoading(false);
       }
@@ -26,10 +39,18 @@ const FinalCTA: React.FC<Props> = ({ data }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Fix: Explicitly cast Object.entries to [string, number][] to prevent 'unknown' comparison error.
-  const lowAuditKeys = (Object.entries(data.audit) as [string, number][])
-    .filter(([_, v]) => v <= 2)
-    .map(([k]) => k.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()));
+  const handleSendResults = async () => {
+    if (!insight || resultsSent) return;
+    setResultsSending(true);
+    try {
+      await requestResultsEmail(email, firstName, data, insight);
+      setResultsSent(true);
+    } catch {
+      setResultsSent(true); // Optimistic — don't surface webhook errors to user
+    } finally {
+      setResultsSending(false);
+    }
+  };
 
   return (
     <div className="space-y-10 animate-in fade-in duration-700">
@@ -48,7 +69,7 @@ const FinalCTA: React.FC<Props> = ({ data }) => {
             </div>
           ) : (
             <div className="prose prose-sm text-gray-700 leading-relaxed font-serif italic text-lg">
-              "{insight}"
+              &ldquo;{insight}&rdquo;
             </div>
           )}
         </div>
@@ -71,13 +92,13 @@ const FinalCTA: React.FC<Props> = ({ data }) => {
 
       <div className="space-y-6 border-t border-gray-100 pt-10">
         <div className="space-y-4 text-center">
-          <h3 className="text-2xl font-bold">You don’t need motivation.</h3>
+          <h3 className="text-2xl font-bold">You don&apos;t need motivation.</h3>
           <p className="text-xl font-light text-gray-600">You need structure.</p>
         </div>
 
         <div className="text-sm text-gray-600 space-y-4 leading-relaxed bg-black/5 p-6 rounded-lg text-center">
           <p>
-            The <strong>Integrity Protocol</strong> is not therapy. It is a structured weekly system 
+            The <strong>Integrity Protocol</strong> is not therapy. It is a structured weekly system
             designed specifically for professionals who use sexual behavior as a coping mechanism.
           </p>
           <p className="font-bold text-black uppercase tracking-tighter text-lg">Week 1 is free.</p>
@@ -91,6 +112,20 @@ const FinalCTA: React.FC<Props> = ({ data }) => {
         >
           Enter the Protocol →
         </a>
+
+        {email && !loading && (
+          <button
+            onClick={handleSendResults}
+            disabled={resultsSent || resultsSending}
+            className="block w-full border border-gray-300 text-gray-700 text-center py-4 font-medium text-sm tracking-widest uppercase hover:border-black hover:text-black transition-all disabled:opacity-50 disabled:cursor-default"
+          >
+            {resultsSent
+              ? '✓ Results Sent to Your Email'
+              : resultsSending
+              ? 'Sending...'
+              : 'Email These Results to Myself'}
+          </button>
+        )}
 
         <p className="text-center text-[10px] text-gray-400 uppercase tracking-[0.2em] pt-4">
           Strictly Confidential • No data persistent after session close
