@@ -1,23 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import { AssessmentData } from '../types';
 import { getClarityInsight } from '../services/geminiService';
+import { sendCompletionData, requestResultsEmail } from '../services/emailService';
 
 interface Props {
   data: AssessmentData;
   email: string;
+  firstName: string;
 }
 
-const FinalCTA: React.FC<Props> = ({ data, email }) => {
+const FinalCTA: React.FC<Props> = ({ data, email, firstName }) => {
   const [insight, setInsight] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [resultsSent, setResultsSent] = useState(false);
+  const [resultsSending, setResultsSending] = useState(false);
+
+  const lowAuditKeys = (Object.entries(data.audit) as [string, number][])
+    .filter(([_, v]) => v >= 0 && v <= 2)
+    .map(([k]) => k.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()));
 
   useEffect(() => {
     const fetchInsight = async () => {
       try {
         const text = await getClarityInsight(data);
-        setInsight(text || 'Clarity achieved. Review your path forward.');
+        const memo = text || 'Clarity achieved. Review your path forward.';
+        setInsight(memo);
+        // Fire completion event with full assessment data for CRM segmentation
+        sendCompletionData(email, firstName, data, memo).catch(() => {});
       } catch (e) {
-        setInsight('Review your audit results to identify your vulnerability vectors.');
+        const fallback = 'Review your audit results to identify your vulnerability vectors.';
+        setInsight(fallback);
+        sendCompletionData(email, firstName, data, fallback).catch(() => {});
       } finally {
         setLoading(false);
       }
@@ -26,23 +39,18 @@ const FinalCTA: React.FC<Props> = ({ data, email }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const lowAuditKeys = (Object.entries(data.audit) as [string, number][])
-    .filter(([_, v]) => v >= 0 && v <= 2)
-    .map(([k]) => k.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()));
-
-  const mailtoBody = [
-    `Your 5-Minute Integrity Check Results`,
-    ``,
-    `Coping Indicators: ${data.patterns.filter(p => p).length} / 8`,
-    `Primary Vulnerability: ${lowAuditKeys.length > 0 ? lowAuditKeys[0] : 'None Detected'}`,
-    ``,
-    `Clarity Memo:`,
-    insight ?? 'Loading...',
-    ``,
-    `Next step: https://integrity.scifsi.com/`,
-  ].join('\n');
-
-  const mailtoLink = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent('Your 5-Minute Integrity Check Results')}&body=${encodeURIComponent(mailtoBody)}`;
+  const handleSendResults = async () => {
+    if (!insight || resultsSent) return;
+    setResultsSending(true);
+    try {
+      await requestResultsEmail(email, firstName, data, insight);
+      setResultsSent(true);
+    } catch {
+      setResultsSent(true); // Optimistic — don't surface webhook errors to user
+    } finally {
+      setResultsSending(false);
+    }
+  };
 
   return (
     <div className="space-y-10 animate-in fade-in duration-700">
@@ -106,12 +114,17 @@ const FinalCTA: React.FC<Props> = ({ data, email }) => {
         </a>
 
         {email && !loading && (
-          <a
-            href={mailtoLink}
-            className="block w-full border border-gray-300 text-gray-700 text-center py-4 font-medium text-sm tracking-widest uppercase hover:border-black hover:text-black transition-all"
+          <button
+            onClick={handleSendResults}
+            disabled={resultsSent || resultsSending}
+            className="block w-full border border-gray-300 text-gray-700 text-center py-4 font-medium text-sm tracking-widest uppercase hover:border-black hover:text-black transition-all disabled:opacity-50 disabled:cursor-default"
           >
-            Email These Results to Myself
-          </a>
+            {resultsSent
+              ? '✓ Results Sent to Your Email'
+              : resultsSending
+              ? 'Sending...'
+              : 'Email These Results to Myself'}
+          </button>
         )}
 
         <p className="text-center text-[10px] text-gray-400 uppercase tracking-[0.2em] pt-4">
