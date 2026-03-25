@@ -1,29 +1,20 @@
-
 import { GoogleGenAI } from "@google/genai";
 import { AssessmentData } from "../types";
 
-let ai: GoogleGenAI | null = null;
-
-function getAI(): GoogleGenAI {
-  if (!ai) {
-    const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY || '';
-    ai = new GoogleGenAI({ apiKey });
-  }
-  return ai;
-}
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 
 export const getClarityInsight = async (data: AssessmentData) => {
   const auditValues = Object.values(data.audit) as number[];
   const yesCount = data.patterns.filter(p => p).length;
   const lowAuditScores = (Object.entries(data.audit) as [string, number][])
-    .filter(([_, val]) => val <= 2)
-    .map(([key, _]) => key);
+    .filter(([_, val]) => val >= 0 && val <= 2)
+    .map(([key]) => key);
 
   const prompt = `
     Analyze the following results from "The 5-Minute Integrity Check" for a high-functioning professional:
     
     - Pattern Recognition: ${yesCount} out of 8 signs of private sexual coping detected.
-    - Loneliness Audit: ${auditValues.join(', ')} (0-5 scale).
+    - Loneliness Audit: ${auditValues.map(v => v === -1 ? 'not rated' : v).join(', ')} (0-5 scale).
     - Vulnerability Vectors: ${lowAuditScores.length > 0 ? lowAuditScores.join(', ') : 'None identified'}.
     - Pivot Reflection: Cost: "${data.pivot.cost}", Change: "${data.pivot.change}".
 
@@ -33,7 +24,7 @@ export const getClarityInsight = async (data: AssessmentData) => {
   `;
 
   try {
-    const response = await getAI().models.generateContent({
+    const response = await ai.models.generateContent({
       model: 'gemini-2.0-flash',
       contents: prompt,
       config: {
