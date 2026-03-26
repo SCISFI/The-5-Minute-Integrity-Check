@@ -1,100 +1,43 @@
 import { AssessmentData } from '../types';
 
-const post = async (payload: object): Promise<void> => {
-  const webhookUrl = import.meta.env.VITE_EMAIL_WEBHOOK_URL;
-  if (!webhookUrl) {
-    console.warn('VITE_EMAIL_WEBHOOK_URL is not configured.');
-    return;
-  }
-  await fetch(webhookUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-};
-
-export const captureEmail = async (email: string, firstName: string): Promise<void> => {
-  try {
-    await post({
-      event: 'lead_captured',
-      email,
-      firstName,
-      timestamp: new Date().toISOString(),
-      source: '5-minute-integrity-check',
-    });
-  } catch (err) {
-    console.error('Email capture failed:', err);
-  }
-};
-
-export const sendCompletionData = async (
+export const buildMailtoLink = (
   email: string,
   firstName: string,
   data: AssessmentData,
   clarityMemo: string,
-): Promise<void> => {
+): string => {
   const copingCount = data.patterns.filter(Boolean).length;
 
   const vulnerabilityVectors = (Object.entries(data.audit) as [string, number][])
     .filter(([_, v]) => v >= 0 && v <= 2)
     .map(([k]) => k.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase()));
 
-  const segment =
-    copingCount >= 6 ? 'high-risk' :
-    copingCount >= 3 ? 'moderate' :
-    'low-risk';
+  const subject = `Your 5-Minute Integrity Check Results`;
 
-  try {
-    await post({
-      event: 'assessment_completed',
-      email,
-      firstName,
-      timestamp: new Date().toISOString(),
-      source: '5-minute-integrity-check',
-      segment,
-      assessment: {
-        copingIndicators: copingCount,
-        copingIndicatorsOutOf: data.patterns.length,
-        auditScores: data.audit,
-        vulnerabilityVectors,
-        primaryVulnerability: vulnerabilityVectors[0] ?? null,
-        pivot: data.pivot,
-      },
-      clarityMemo,
-    });
-  } catch (err) {
-    console.error('Completion data send failed:', err);
-  }
-};
+  const body = [
+    `${firstName},`,
+    ``,
+    `Here are your results from The 5-Minute Integrity Check.`,
+    ``,
+    `--- CLARITY MEMO ---`,
+    clarityMemo,
+    ``,
+    `--- ASSESSMENT SUMMARY ---`,
+    `Coping Indicators: ${copingCount} / ${data.patterns.length}`,
+    `Primary Vulnerability: ${vulnerabilityVectors[0] ?? 'None Detected'}`,
+    vulnerabilityVectors.length > 1 ? `All Vulnerability Vectors: ${vulnerabilityVectors.join(', ')}` : '',
+    ``,
+    `--- PIVOT REFLECTION ---`,
+    `What it costs: ${data.pivot.cost || '(not answered)'}`,
+    `What it risks: ${data.pivot.risk || '(not answered)'}`,
+    `What changes first: ${data.pivot.change || '(not answered)'}`,
+    ``,
+    `--- NEXT STEP ---`,
+    `You don't need motivation. You need structure.`,
+    `Enter the Integrity Protocol: https://integrity.scifsi.com/`,
+    ``,
+    `Strictly Confidential`,
+  ].filter(line => line !== '').join('\n');
 
-export const requestResultsEmail = async (
-  email: string,
-  firstName: string,
-  data: AssessmentData,
-  clarityMemo: string,
-): Promise<void> => {
-  const copingCount = data.patterns.filter(Boolean).length;
-
-  const vulnerabilityVectors = (Object.entries(data.audit) as [string, number][])
-    .filter(([_, v]) => v >= 0 && v <= 2)
-    .map(([k]) => k.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase()));
-
-  try {
-    await post({
-      event: 'results_email_requested',
-      email,
-      firstName,
-      timestamp: new Date().toISOString(),
-      source: '5-minute-integrity-check',
-      assessment: {
-        copingIndicators: copingCount,
-        copingIndicatorsOutOf: data.patterns.length,
-        primaryVulnerability: vulnerabilityVectors[0] ?? null,
-        vulnerabilityVectors,
-      },
-      clarityMemo,
-    });
-  } catch (err) {
-    console.error('Results email request failed:', err);
-  }
+  return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 };
