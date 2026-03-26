@@ -5,8 +5,19 @@ let ai: GoogleGenAI | null = null;
 
 function getAI(): GoogleGenAI {
   if (!ai) {
-    const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY || '';
-    ai = new GoogleGenAI({ apiKey });
+    const apiKey = process.env.GEMINI_API_KEY || '';
+    const baseUrl = process.env.GEMINI_BASE_URL || '';
+
+    const options: ConstructorParameters<typeof GoogleGenAI>[0] = { apiKey };
+
+    if (baseUrl) {
+      options.httpOptions = {
+        apiVersion: '',
+        baseUrl,
+      };
+    }
+
+    ai = new GoogleGenAI(options);
   }
   return ai;
 }
@@ -33,7 +44,7 @@ export const getClarityInsight = async (data: AssessmentData) => {
 
   try {
     const response = await getAI().models.generateContent({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
         temperature: 0.7,

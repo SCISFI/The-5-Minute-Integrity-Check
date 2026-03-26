@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { captureEmail } from '../services/emailService';
 
 interface Props {
   onStart: (email: string, firstName: string) => void;
@@ -10,17 +9,13 @@ const Landing: React.FC<Props> = ({ onStart }) => {
   const [firstName, setFirstName] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    try {
-      await captureEmail(email, firstName);
-    } catch {
-      // Non-blocking — proceed even if capture fails
-    } finally {
+    setTimeout(() => {
       setLoading(false);
       onStart(email, firstName);
-    }
+    }, 400);
   };
 
   return (
