@@ -37,7 +37,7 @@ export default async function handler(req: any, res: any) {
           if (!email || !data) return res.status(400).json({ error: 'Missing required fields' });
           const resend = new Resend(process.env.RESEND_API_KEY);
           await resend.emails.send({
-                  from: 'Dr. Ken Taylor <onboarding@resend.dev>',
+                  from: 'Dr. Ken Taylor <ken@scifsi>',
                   to: email,
                   subject: 'Your 5-Minute Integrity Check Results',
                   html: buildHTML(firstName || 'there', data, clarityMemo || ''),
