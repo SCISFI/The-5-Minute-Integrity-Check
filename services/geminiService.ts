@@ -1,59 +1,43 @@
-import { GoogleGenAI } from "@google/genai";
 import { AssessmentData } from "../types";
 
-let ai: GoogleGenAI | null = null;
+const formatKey = (key: string): string =>
+  key.replace(/([A-Z])/g, ' $1').trim().replace(/^./, s => s.toUpperCase());
 
-function getAI(): GoogleGenAI {
-  if (!ai) {
-    const apiKey = process.env.GEMINI_API_KEY || '';
-    const baseUrl = process.env.GEMINI_BASE_URL || '';
-
-    const options: ConstructorParameters<typeof GoogleGenAI>[0] = { apiKey };
-
-    if (baseUrl) {
-      options.httpOptions = {
-        apiVersion: '',
-        baseUrl,
-      };
-    }
-
-    ai = new GoogleGenAI(options);
-  }
-  return ai;
-}
-
-export const getClarityInsight = async (data: AssessmentData) => {
-  const auditValues = Object.values(data.audit) as number[];
+export const getClarityInsight = async (data: AssessmentData): Promise<string> => {
   const yesCount = data.patterns.filter(p => p).length;
-  const lowAuditScores = (Object.entries(data.audit) as [string, number][])
-    .filter(([_, val]) => val >= 0 && val <= 2)
-    .map(([key]) => key);
+  const lowScores = (Object.entries(data.audit) as [string, number][])
+    .filter(([_, v]) => v >= 0 && v <= 2)
+    .map(([k]) => formatKey(k));
 
-  const prompt = `
-    Analyze the following results from "The 5-Minute Integrity Check" for a high-functioning professional:
-    
-    - Pattern Recognition: ${yesCount} out of 8 signs of private sexual coping detected.
-    - Loneliness Audit: ${auditValues.map(v => v === -1 ? 'not rated' : v).join(', ')} (0-5 scale).
-    - Vulnerability Vectors: ${lowAuditScores.length > 0 ? lowAuditScores.join(', ') : 'None identified'}.
-    - Pivot Reflection: Cost: "${data.pivot.cost}", Change: "${data.pivot.change}".
+  const primaryVector = lowScores[0] ?? null;
+  const secondaryVector = lowScores[1] ?? null;
 
-    Provide a professional, executive-style clarity memo. 
-    Use a tone that is direct, non-shaming, and focused on "structure over motivation".
-    Keep it under 150 words. Focus on the connection between isolation and behavior.
-  `;
-
-  try {
-    const response = await getAI().models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-      config: {
-        temperature: 0.7,
-        topP: 0.9,
-      }
-    });
-    return response.text;
-  } catch (error) {
-    console.error("Error generating insight:", error);
-    return "Error generating professional insight. Please focus on your audit results below.";
+  let intensityLine: string;
+  if (yesCount >= 6) {
+    intensityLine = `At ${yesCount} of 8 indicators, this pattern is deeply integrated — efficient, private, and structurally embedded in your daily life.`;
+  } else if (yesCount >= 3) {
+    intensityLine = `At ${yesCount} of 8 indicators, a clear behavioral pattern has formed. Its effectiveness is precisely what makes it invisible.`;
+  } else {
+    intensityLine = `At ${yesCount} of 8 indicators, early-stage patterns are present. Recognizing this now is a significant structural advantage.`;
   }
+
+  let vectorLine: string;
+  if (primaryVector && secondaryVector) {
+    vectorLine = `Your two primary vulnerability vectors — ${primaryVector} and ${secondaryVector} — represent the relational deficits this behavior is engineered to fill.`;
+  } else if (primaryVector) {
+    vectorLine = `Your primary vulnerability — ${primaryVector} — is the structural gap where behavior substitutes for connection.`;
+  } else {
+    vectorLine = `No single dominant vector emerged, suggesting the pattern operates across multiple relational domains simultaneously.`;
+  }
+
+  let pivotLine: string;
+  if (data.pivot.cost && data.pivot.change) {
+    pivotLine = `You named the cost as "${data.pivot.cost}" and identified that "${data.pivot.change}" changes first. That specificity is rare — and it is actionable.`;
+  } else if (data.pivot.cost) {
+    pivotLine = `You have already named the cost: "${data.pivot.cost}." That clarity is the first structural intervention.`;
+  } else {
+    pivotLine = `The cost is already visible in your data. The next step is building structure around that awareness.`;
+  }
+
+  return `${intensityLine} This is not a character defect — it is a precision coping mechanism deployed by a high-functioning professional under sustained pressure. ${vectorLine} ${pivotLine} Motivation will not hold. Structure will.`;
 };
