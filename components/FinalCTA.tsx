@@ -84,7 +84,7 @@ const FinalCTA: React.FC<Props> = ({ data, email, firstName }) => {
             The <strong>Integrity Protocol</strong> is not therapy. It is a structured weekly system
             designed specifically for professionals who use sexual behavior as a coping mechanism.
           </p>
-          <p className="font-bold text-black uppercase tracking-tighter text-lg">Week 1 is free.</p>
+          <p className="font-bold text-black uppercase tracking-tighter text-lg">The AI Coach tier is free.</p>
         </div>
 
         <a
