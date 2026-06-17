@@ -21,3 +21,12 @@ export enum AppState {
   PIVOT = 'PIVOT',
   RESULT = 'RESULT'
 }
+
+export interface CrisisData {
+  whatHappened: string[];
+  honestDescription: string;
+  tempted: string[];
+  partnerNeeds: string[];
+  nextAction: string[];
+  statement: string;
+}
