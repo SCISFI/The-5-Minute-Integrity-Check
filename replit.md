@@ -1,7 +1,7 @@
 # The 5-Minute Integrity Check
 
 ## Overview
-A React-based single-page assessment tool for professionals. The app guides users through a multi-step integrity check including pattern recognition, a loneliness audit, and pivot questions, then generates an AI-powered executive summary using Google Gemini.
+A React-based single-page assessment tool. The default front door is the **First 24 Hours Integrity Check** ("Caught Again? Start Here") — an acute-crisis stabilization flow for someone just caught in or disclosing problematic sexual behavior. The original reflective **5-Minute Integrity Check** (pattern recognition, loneliness audit, pivot questions + deterministic clarity memo) remains available via a secondary link. `App.tsx` is a simple mode switcher between the two; both are fully client-side with no backend, routing, or data persistence.
 
 ## Project Architecture
 - **Framework**: React 19 + TypeScript + Vite
@@ -17,17 +17,21 @@ A React-based single-page assessment tool for professionals. The app guides user
 ├── index.html          # Entry HTML with Google Fonts
 ├── index.tsx           # React root mount + CSS import
 ├── styles.css          # Tailwind CSS entry point
-├── App.tsx             # Main app with step navigation + progress bar
-├── types.ts            # TypeScript types (AssessmentData, AppState enum)
+├── App.tsx             # Mode switcher: CrisisCheck (default) vs OriginalCheck
+├── types.ts            # TypeScript types (AssessmentData, CrisisData, AppState enum)
 ├── components/
-│   ├── Landing.tsx      # First name + email capture landing page
-│   ├── Intro.tsx        # Introduction/briefing step
+│   ├── CrisisCheck.tsx  # Front door: First 24 Hours Integrity Check (landing → guardrails → 5 steps → completion)
+│   ├── CrisisResources.tsx     # Shared crisis/safety resources panel (988, 741741, 911)
+│   ├── OriginalCheck.tsx       # Original 5-Minute Integrity Check flow (extracted from old App.tsx)
+│   ├── Landing.tsx      # First name + email capture landing page (original flow)
+│   ├── Intro.tsx        # Introduction/briefing step (original flow)
 │   ├── PatternRecognition.tsx  # Part I: Pattern assessment (8 questions)
 │   ├── LonelinessAudit.tsx     # Part II: Loneliness audit (0-5 scale)
 │   ├── PivotQuestion.tsx       # Part III: Pivot reflection questions
-│   └── FinalCTA.tsx            # AI-generated executive summary + mailto + CTA
+│   └── FinalCTA.tsx            # Executive summary + mailto + CTA (original flow)
 ├── services/
-│   ├── geminiService.ts  # Gemini API integration (lazy init, Replit AI Integrations)
+│   ├── geminiService.ts  # Deterministic clarity-memo generator for original flow (no network call)
+│   ├── crisisSummary.ts  # Deterministic stabilizing memo + high-risk detection for crisis flow
 │   └── emailService.ts   # mailto: link builder for emailing results
 ├── vite.config.ts       # Vite config (port 5000, Tailwind plugin, env injection)
 ├── tsconfig.json        # TypeScript config
