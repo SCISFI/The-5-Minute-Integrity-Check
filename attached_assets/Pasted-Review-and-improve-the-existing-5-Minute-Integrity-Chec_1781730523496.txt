@@ -1,0 +1,294 @@
+Review and improve the existing “5-Minute Integrity Check” / check-in flow so it works better as a front-door tool for a man who has just been caught in problematic sexual behavior.
+
+Goal:
+The current 5-minute check-in needs to become more immediately useful for a man in acute crisis after discovery, disclosure, relapse, exposure, or confrontation.
+
+Do not break or alter the existing daily check-in system for current IP users unless absolutely necessary. If the current 5-minute check-in is shared with daily check-ins, create a separate front-door version instead of changing the core daily check-in behavior.
+
+Preferred new public-facing name:
+“Caught Again? Start Here”
+
+Subtitle:
+“The First 24 Hours Integrity Check”
+
+Purpose:
+This tool is not a normal reflection exercise. It is an acute stabilization tool. It should help a man slow down, stop making things worse, tell the truth to himself first, avoid defensive or manipulative repair attempts, and take one clear next step toward accountability.
+
+Key implementation instruction:
+First, search the repo for the existing 5-minute check-in code, routes, components, prompts, database fields, AI prompt templates, completion flow, and any marketing/landing-page references. Identify whether this check-in is:
+
+* a standalone public/free tool,
+* part of AI Coach,
+* part of daily check-ins,
+* tied to user accounts,
+* tied to onboarding,
+* tied to lead capture,
+* or reused across multiple places.
+
+Make the smallest safe change that accomplishes this new front-door tool. Preserve current behavior everywhere else.
+
+Public opening screen copy:
+Title:
+“Caught Again? Start Here”
+
+Subtitle:
+“The First 24 Hours Integrity Check”
+
+Intro body:
+“You may feel panic, shame, anger, fear, or the urge to explain. This is not the moment to perform, defend, bargain, minimize, or make big promises.
+
+This check will help you slow down, tell the truth, and choose your next right step without making more damage.”
+
+Safety notice:
+“This is not emergency counseling. If anyone is unsafe, at risk of self-harm, being threatened, or in immediate danger, contact emergency support now.”
+
+Add a clear button:
+“Begin the Check”
+
+Clinical guardrails screen:
+Before the questions, show:
+
+“For the next 24 hours, do not:
+
+* Pressure her to forgive you.
+* Demand that she calm down.
+* Ask her to comfort you.
+* Blame stress, marriage problems, loneliness, or her reactions.
+* Minimize what happened.
+* Delete evidence.
+* Add new partial truths after being confronted.
+* Make promises you have not yet earned.
+* Contact the other person.
+* Try to force a relationship decision today.”
+
+Then continue button:
+“I understand. Continue.”
+
+Question flow:
+Use a short, structured, 5-step flow.
+
+Step 1: What just happened?
+
+Prompt:
+“What were you caught doing, or what did you disclose?”
+
+Options:
+
+* Porn use
+* Messaging/chatting
+* Emotional/sexual contact
+* Affair behavior
+* Paid sexual content/services
+* Hidden app/account/device behavior
+* Relapse after a promise
+* Lying/trickle truth
+* Other
+
+Free-text prompt:
+“What is the most honest one-sentence description of what happened?”
+
+Important:
+Do not label this as “your side of the story.” Keep it factual.
+
+Step 2: What are you tempted to do right now?
+
+Prompt:
+“What are you most tempted to do right now?”
+
+Options:
+
+* Defend myself
+* Explain why it happened
+* Minimize it
+* Blame her reaction
+* Promise it will never happen again
+* Delete or hide more information
+* Demand reassurance
+* Shut down or disappear
+* Contact the other person
+* Hurt myself
+* Use again
+* Other
+
+Safety behavior:
+If the user selects “Hurt myself,” “Use again,” threats, danger, or indicates immediate safety risk, show a higher-risk support message and crisis resources. Do not continue with normal coaching as if nothing is wrong.
+
+Suggested safety message:
+“Your safety matters more than finishing this check. If you may harm yourself or someone else, or if anyone is in immediate danger, contact emergency services or a crisis line now. Do not stay alone with this.”
+
+Use any existing crisis-resource component if one already exists in the app. Do not create conflicting crisis language if the app already has a standard crisis-resource pattern.
+
+Step 3: What might she need from you right now?
+
+Prompt:
+“What might your spouse/partner need most from you in the next 24 hours?”
+
+Options:
+
+* Space
+* Truth without pressure
+* No more discoveries
+* No defensiveness
+* A written timeline later
+* A commitment to get outside help
+* Practical safety
+* Transparency
+* To not be responsible for my emotions
+* Other
+
+Important:
+Do not ask, “What do you need her to understand?” This step should move him away from self-protection and toward empathy and responsibility.
+
+Step 4: What is your next honest action?
+
+Prompt:
+“In the next 24 hours, I will:”
+
+Options:
+
+* Stop arguing and give her space
+* Write down the factual truth before speaking further
+* Contact my counselor/mentor/sponsor
+* Begin the free AI Coach check-in
+* Schedule an intake
+* Remove access to the acting-out pathway
+* Avoid contact with the other person
+* Sleep somewhere else if needed for safety/stability
+* Not ask for forgiveness today
+* Not demand a decision from her today
+* Other
+
+Step 5: What can you say without making it worse?
+
+Provide a suggested statement the user can copy, edit, or save:
+
+“I know I have hurt you. I am not going to pressure you to calm down or forgive me. I am going to stop explaining and take responsibility for getting help. I will give you space, and I will not ask you to carry my emotions right now.”
+
+Allow the user to edit this statement if appropriate.
+
+Completion screen:
+Title:
+“You completed the First 24 Hours Integrity Check.”
+
+Body:
+“Your next step is not another promise. Your next step is structure.
+
+For the next 24 hours, focus on truth, space, accountability, and not making the damage worse.”
+
+Show the selected next honest action back to the user.
+
+Primary CTA:
+“Continue with Free AI Coach”
+
+Secondary CTA:
+“Start Integrity Protocol”
+
+Optional CTA if it already exists:
+“Request Mentor Support”
+
+Do not force a paid upgrade before the tool has delivered value. The upgrade path should come after completion.
+
+AI response behavior:
+If this flow uses an AI-generated response, update the AI prompt so the response is:
+
+* direct,
+* stabilizing,
+* clinically grounded,
+* non-shaming,
+* non-excusing,
+* non-defensive,
+* focused on the next 24 hours,
+* not overly therapeutic,
+* not overly religious,
+* not overly long.
+
+The AI should not:
+
+* help the man craft excuses,
+* help him manage his spouse’s emotions,
+* tell him how to get forgiveness,
+* encourage immediate disclosure dumping,
+* encourage trickle truth,
+* encourage him to demand reassurance,
+* minimize betrayal impact,
+* overpromise recovery outcomes.
+
+The AI should:
+
+* reflect the factual behavior,
+* name the immediate risk pattern,
+* reinforce responsibility,
+* recommend one next honest action,
+* remind him not to pressure his spouse,
+* encourage outside support,
+* point him to AI Coach / Integrity Protocol as the next structured step.
+
+Light biblical application:
+Include a light biblical application where appropriate, but do not make the tool sound churchy.
+
+Suggested biblical concept:
+“The first faithful step is not to repair your image. It is to come into the light.”
+
+Optional KJV reference:
+John 3:21 — “But he that doeth truth cometh to the light…”
+
+Apply this as a principle of truth and responsibility, not as a sermon. Do not use religious language to bypass accountability or pressure reconciliation.
+
+Marketing/landing-page positioning:
+If there is an existing landing page or entry point for the 5-minute check-in, update the front-door language to focus on acute discovery.
+
+Suggested headline:
+“Caught Again? Start Here.”
+
+Suggested subheadline:
+“A private 5-minute check for men who need to slow down, tell the truth, and take one honest next step before making things worse.”
+
+Suggested CTA:
+“Start the First 24 Hours Check”
+
+Preservation requirements:
+
+* Do not break existing daily check-ins.
+* Do not break AI Coach.
+* Do not break paid IP track access.
+* Do not break mentor/admin dashboards.
+* Do not change payment behavior.
+* Do not change Partner Protocol work.
+* Do not rename SLIP or any unrelated feature.
+* Do not alter existing user data unnecessarily.
+* Do not remove existing crisis-resource components.
+* Do not refactor unrelated code.
+* Do not make broad styling changes beyond what is necessary for this flow.
+
+Technical guidance:
+
+* Reuse existing components where safe.
+* If the current 5-minute check-in is deeply tied to daily check-ins, create a new route/page/component for this front-door tool.
+* If a database table already stores free check-in results, reuse it only if doing so does not break reporting or existing user flows.
+* If new fields are needed, add only what is necessary.
+* If the tool can be used before login, store temporary results securely and then attach them to the user account if the user creates an account.
+* If the tool requires login today, do not remove authentication without checking security implications. Instead, propose the safest minimal public-entry approach.
+* Use server-side validation for submitted fields.
+* Do not log sensitive free-text answers unnecessarily.
+* Avoid exposing private answers in admin views unless the current app already expects that.
+
+Testing checklist:
+
+1. Existing daily check-ins still work for current users.
+2. Existing AI Coach still works.
+3. Existing paid tracks still work.
+4. Existing mentor/admin dashboards still work.
+5. Existing SLIP flow still works.
+6. Existing Partner Protocol work is untouched.
+7. The new “Caught Again? Start Here” flow can be opened from the intended public/free entry point.
+8. The opening screen shows the new acute-crisis language.
+9. Guardrails screen appears before questions.
+10. User can complete all 5 steps.
+11. Higher-risk selections trigger crisis/safety guidance.
+12. Completion screen shows the selected next honest action.
+13. Completion screen offers Free AI Coach and Start Integrity Protocol.
+14. No payment is triggered by completing this tool.
+15. No unrelated code, copy, routes, billing logic, or schema is changed.
+
+Before building:
+Please summarize what files/routes/components currently power the existing 5-minute check-in and whether you recommend replacing it or creating a separate front-door version. Then implement the smallest safe version.
