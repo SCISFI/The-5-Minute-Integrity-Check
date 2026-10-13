@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { AssessmentData } from '../types';
 import { getClarityInsight } from '../services/geminiService';
 import { sendResultsEmail } from '../services/emailService';
+import { buildProtocolHandoff } from '../services/protocolHandoff';
 
 interface Props {
   data: AssessmentData;
@@ -14,9 +15,12 @@ const FinalCTA: React.FC<Props> = ({ data, email, firstName }) => {
   const [loading, setLoading] = useState(true);
   const [emailStatus, setEmailStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
 
-  const lowAuditKeys = (Object.entries(data.audit) as [string, number][])
-    .filter(([_, v]) => v >= 0 && v <= 2)
-    .map(([k]) => k.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()));
+  const handoff = buildProtocolHandoff(data);
+  const featuredAreas = handoff.lowAreas.slice(0, 2);
+  const otherLowAreas = handoff.lowAreas.slice(2);
+  const patternLine = firstName
+    ? `${firstName}, ${handoff.patternLine.charAt(0).toLowerCase()}${handoff.patternLine.slice(1)}`
+    : handoff.patternLine;
 
   useEffect(() => {
     getClarityInsight(data)
@@ -26,7 +30,7 @@ const FinalCTA: React.FC<Props> = ({ data, email, firstName }) => {
   }, []);
 
   const handleSendEmail = async () => {
-    if (!insight || emailStatus !== 'idle') return;
+    if (!insight || emailStatus === 'sending' || emailStatus === 'sent') return;
     setEmailStatus('sending');
     try {
       await sendResultsEmail(email, firstName, data, insight);
@@ -49,7 +53,7 @@ const FinalCTA: React.FC<Props> = ({ data, email, firstName }) => {
           {loading ? (
             <div className="flex flex-col items-center gap-4 py-8">
               <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-xs text-gray-500 uppercase tracking-widest">Synthesizing private data...</p>
+              <p className="text-xs text-gray-500 uppercase tracking-widest">Writing your clarity memo...</p>
             </div>
           ) : (
             <div className="prose prose-sm text-gray-700 leading-relaxed font-serif italic text-lg">
@@ -65,11 +69,13 @@ const FinalCTA: React.FC<Props> = ({ data, email, firstName }) => {
             <p className="text-xs text-gray-500 mt-1">Signs of sexual behavioral regulation</p>
           </div>
           <div className="p-6 border border-gray-100 rounded-lg">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Primary Vulnerability</h3>
+            <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Lowest loneliness area</h3>
             <p className="text-sm font-bold text-red-600 uppercase">
-              {lowAuditKeys.length > 0 ? lowAuditKeys[0] : 'None Detected'}
+              {handoff.primaryLabel}
             </p>
-            <p className="text-xs text-gray-500 mt-1">Vector of emotional isolation</p>
+            <p className="text-xs text-gray-500 mt-1">
+              {handoff.primaryScore === null ? 'No area at 2 or below' : `Rated ${handoff.primaryScore} of 5`}
+            </p>
           </div>
         </div>
       </div>
@@ -80,27 +86,42 @@ const FinalCTA: React.FC<Props> = ({ data, email, firstName }) => {
           <p className="text-xl font-light text-gray-600">You need structure.</p>
         </div>
 
-        <div className="text-sm text-gray-600 space-y-4 leading-relaxed bg-black/5 p-6 rounded-lg text-center">
-          <p>
-            The <strong>Integrity Protocol</strong> is not therapy. It is a structured weekly system
-            designed specifically for professionals who use sexual behavior as a coping mechanism.
-          </p>
-          <p className="font-bold text-black uppercase tracking-tighter text-lg">Week 1 is free.</p>
+        <div className="text-sm text-gray-700 space-y-4 leading-relaxed bg-black/5 p-6 rounded-lg text-left">
+          <p>{patternLine}</p>
+          {handoff.steadyLine && <p>{handoff.steadyLine}</p>}
+          {featuredAreas.map((area) => (
+            <p key={area.key}>
+              <span className="font-semibold text-gray-900">{area.label}</span>
+              {`, rated ${area.score} of 5. ${area.tie}`}
+            </p>
+          ))}
+          {otherLowAreas.length > 0 && (
+            <p>
+              Also low: {otherLowAreas.map((area) => `${area.label} (${area.score} of 5)`).join(', ')}.
+            </p>
+          )}
+          {handoff.pivotLine && <p>{handoff.pivotLine}</p>}
+          <p>{handoff.trackSummary}</p>
+          <p className="font-bold text-black text-base">{handoff.offerLine}</p>
+          <p className="text-xs text-gray-500">{handoff.priceLine}</p>
         </div>
 
         <a
-          href="https://integrity.scifsi.com/"
+          href={handoff.signupUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="block w-full bg-black text-white text-center py-6 font-bold text-xl tracking-widest uppercase hover:bg-gray-800 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 active:translate-y-0"
+          className="block w-full bg-black text-white text-center py-6 px-4 font-bold text-base sm:text-lg tracking-widest uppercase hover:bg-gray-800 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 active:translate-y-0"
         >
-          Enter the Protocol &rarr;
+          {handoff.buttonLabel} &rarr;
         </a>
+        <p className="text-center text-xs text-gray-500 -mt-2">
+          Opens the signup page with {handoff.trackName} selected. You can change the program, then choose a mentor and set a password. No credit card on that page.
+        </p>
 
         {email && !loading && (
           <button
             onClick={handleSendEmail}
-            disabled={emailStatus !== 'idle'}
+            disabled={emailStatus === 'sending' || emailStatus === 'sent'}
             className="block w-full border border-gray-300 text-gray-700 text-center py-4 font-medium text-sm tracking-widest uppercase hover:border-black hover:text-black transition-all disabled:opacity-50 disabled:cursor-default"
           >
             {emailStatus === 'sent'
@@ -108,19 +129,19 @@ const FinalCTA: React.FC<Props> = ({ data, email, firstName }) => {
               : emailStatus === 'sending'
               ? 'Sending...'
               : emailStatus === 'error'
-              ? 'Send Failed \u2014 Check Email Settings'
+              ? 'Try sending again'
               : 'Email These Results to Myself'}
           </button>
         )}
 
         {emailStatus === 'error' && (
           <p className="text-center text-xs text-red-500 -mt-4">
-            Email delivery failed. Ensure SMTP credentials are configured in Replit Secrets.
+            We couldn&apos;t send that email. Please try again, or write support@scifsi.com and we will help.
           </p>
         )}
 
-        <p className="text-center text-[10px] text-gray-400 uppercase tracking-[0.2em] pt-4">
-          Strictly Confidential &bull; No data persistent after session close
+        <p className="text-center text-xs text-gray-400 leading-relaxed pt-4">
+          Your answers are sent once, without your name or email, to write the clarity memo. We do not save them in an account. Your name and email stay in this browser unless you email the results to yourself.
         </p>
       </div>
     </div>

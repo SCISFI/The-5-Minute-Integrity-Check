@@ -71,10 +71,10 @@ const Landing: React.FC<Props> = ({ onStart }) => {
             disabled={loading}
             className="w-full bg-black text-white py-4 rounded font-medium hover:bg-gray-900 transition-colors disabled:bg-gray-400"
           >
-            {loading ? 'Shedding Light...' : 'Send It Privately & Start'}
+            {loading ? 'Shedding Light...' : 'Begin privately'}
           </button>
-          <p className="text-center text-[10px] text-gray-400 uppercase tracking-widest">
-            Privacy Guaranteed. No data is stored on public servers.
+          <p className="text-center text-xs text-gray-400 leading-relaxed">
+            Your name and email stay in this browser. Your answers are used to write your summary, and are not saved in an account.
           </p>
         </form>
       </div>

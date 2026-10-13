@@ -21,7 +21,7 @@ const Intro: React.FC<{ onNext: () => void }> = ({ onNext }) => {
       <div className="space-y-4 text-sm text-gray-500 leading-relaxed">
         <p>This is not a diagnosis. It’s not a recovery program.</p>
         <p>It’s a <strong>clarity instrument</strong>.</p>
-        <p className="text-gray-900 font-medium underline">Answer honestly. No one sees this but you.</p>
+        <p className="text-gray-900 font-medium underline">Answer honestly. This is not saved in an account, and it is not sent to a person at the Institute.</p>
       </div>
 
       <button
