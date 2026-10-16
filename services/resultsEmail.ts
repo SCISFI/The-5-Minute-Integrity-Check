@@ -1,5 +1,5 @@
-import { AssessmentData } from "../types";
-import { buildProtocolHandoff, handoffParagraphs } from "./protocolHandoff";
+import type { AssessmentData } from "../types.js";
+import { buildProtocolHandoff, handoffParagraphs } from "./protocolHandoff.js";
 
 function escapeHtml(value: string): string {
   return value

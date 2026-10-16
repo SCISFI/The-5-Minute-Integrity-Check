@@ -11,7 +11,7 @@ The crisis check stays in the browser and is not saved. The original check keeps
 - **AI Integration**: Groq (`llama-3.3-70b-versatile`) through `/api/clarity`, with a local fallback paragraph if that call fails. The crisis memo is written in the browser and does not call the API.
 - **Email**: Resend on Vercel (`api/send-email.ts`), or Office 365 SMTP if the Express server in `server/` is the one running. The message goes only to the address the person entered.
 - **Build**: Vite 6, outputs to `dist/`
-- **Local API**: `npm run dev` starts Vite and the Express API together
+- **Hosting**: one Node server (`npm start`) serves the built page and `/api/clarity` plus `/api/send-email`. Replit Autoscale runs that server. The `api/` folder remains so the current Vercel site keeps working until the switch.
 
 ## Project Structure
 ```
@@ -43,13 +43,21 @@ The crisis check stays in the browser and is not saved. The original check keeps
 ```
 
 ## Environment Variables
-- `GROQ_API_KEY`: used by `/api/clarity` and `server/clarity.ts` to write the original clarity memo.
-- `RESEND_API_KEY`: used by `api/send-email.ts` on Vercel.
-- `SMTP_USER` and `SMTP_PASS`: used by `server/email.ts` when the Express server sends mail.
+The server starts without these. The check still runs. Without the writing key, the original results page uses a summary written from the scores. Without mail settings, the email button tells the person to write support@scifsi.com.
 
-The check still runs if those keys are missing. The original results page shows a local summary, and a failed email tells the person to write support@scifsi.com.
+Replit sets `PORT` on an Autoscale deployment. Do not add that as a secret.
+
+- `GROQ_API_KEY`: writes the clarity memo. Create a key at https://console.groq.com/keys. Needed on both Replit and Vercel for the written memo. Optional for the page to load.
+- `SMTP_HOST`: mail server for the Replit app. Defaults to `smtp.office365.com` (Microsoft 365). Optional if that default is correct.
+- `SMTP_PORT`: defaults to `587`. Optional.
+- `SMTP_SECURE`: set to `true` only for a port that expects a secure connection from the start (usually port 465). Optional.
+- `SMTP_USER`: the mailbox username, usually the full email address. Required to send results email from Replit. From the Microsoft 365 mailbox that should send the mail.
+- `SMTP_PASS`: that mailbox's password or app password. Required to send results email from Replit. SMTP sending must be turned on for the mailbox.
+- `SMTP_FROM`: the From line, for example `Dr. Ken Taylor <ken@scifsi.com>`. Optional. If empty, the From line is Dr. Ken Taylor using `SMTP_USER`.
+- `RESEND_API_KEY`: used only by the Vercel function `api/send-email.ts`, from https://resend.com. Not used by the Replit server. Optional once hosting has moved to Replit.
 
 ## Development
 - Run: `npm run dev` (the page on port 5000, the local API on port 3001)
-- Build: `npm run build` (outputs to `dist/`)
-- Deployment: Vercel serves `dist/` and the functions in `api/`
+- Build: `npm run build` (page in `dist/`, server in `dist-server/`)
+- Production: `npm start` serves both on `PORT` (8080 if `PORT` is not set)
+- Deployment: Replit Autoscale runs `npm run build` then `npm start`. Vercel still serves `dist/` and the functions in `api/` until that site is retired.
