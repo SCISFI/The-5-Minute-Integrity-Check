@@ -1,4 +1,4 @@
-import { AssessmentData } from "../types";
+import type { AssessmentData } from "../types.js";
 
 /**
  * Handoff copy for Integrity Protocol.
