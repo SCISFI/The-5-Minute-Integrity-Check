@@ -76,6 +76,10 @@ const Landing: React.FC<Props> = ({ onStart }) => {
           <p className="text-center text-xs text-gray-400 leading-relaxed">
             Your name and email stay in this browser. Your answers are used to write your summary, and are not saved in an account.
           </p>
+          <p className="text-center text-xs text-gray-400 leading-relaxed">
+            We respect your privacy.{' '}
+            <a href="/privacy" className="underline hover:text-black">Privacy policy</a>
+          </p>
         </form>
       </div>
     </div>

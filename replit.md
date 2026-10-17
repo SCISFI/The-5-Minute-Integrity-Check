@@ -11,7 +11,7 @@ The crisis check stays in the browser and is not saved. The original check keeps
 - **AI Integration**: Groq (`llama-3.3-70b-versatile`) through `/api/clarity`, with a local fallback paragraph if that call fails. The crisis memo is written in the browser and does not call the API.
 - **Email**: Resend on Vercel (`api/send-email.ts`), or Office 365 SMTP if the Express server in `server/` is the one running. The message goes only to the address the person entered.
 - **Build**: Vite 6, outputs to `dist/`
-- **Hosting**: one Node server (`npm start`) serves the built page and `/api/clarity` plus `/api/send-email`. Replit Autoscale runs that server. The `api/` folder remains so the current Vercel site keeps working until the switch.
+- **Hosting**: one Node server (`npm start`) serves the built page and `/api/clarity` plus `/api/send-email`. Replit Autoscale runs that server. Any page address, including `/privacy`, falls back to the built app. The `api/` folder remains so the current Vercel site keeps working until the switch. `vercel.json` sends those same page addresses to the app there, and leaves `/api` alone.
 
 ## Project Structure
 ```
@@ -22,6 +22,7 @@ The crisis check stays in the browser and is not saved. The original check keeps
 ├── App.tsx             # Mode switcher: CrisisCheck (default) vs OriginalCheck
 ├── types.ts            # TypeScript types (AssessmentData, CrisisData, AppState enum)
 ├── components/
+│   ├── PrivacyPolicy.tsx       # Privacy policy at /privacy
 │   ├── CrisisCheck.tsx  # Front door: First 24 Hours Integrity Check (landing → guardrails → 5 steps → completion)
 │   ├── CrisisResources.tsx     # Shared crisis/safety resources panel (988, 741741, 911)
 │   ├── OriginalCheck.tsx       # Original 5-Minute Integrity Check flow (extracted from old App.tsx)
