@@ -1,1 +1,21 @@
 @import "tailwindcss";
+
+@theme {
+  --color-room: #e6e0d6;
+  --color-paper: #fbf7f1;
+  --color-ink: #231f1c;
+  --color-quiet: #5f584f;
+  --color-body: #3c362f;
+  --color-notice: #f1e4d6;
+  --color-notice-ink: #2a211c;
+  --color-notice-rule: #7a3f38;
+  --color-gray-50: #f4efe8;
+  --color-gray-100: #ebe4da;
+  --color-gray-200: #e3d9cc;
+  --color-gray-300: #d3c7b8;
+}
+
+.font-source-serif {
+  font-family: "Source Serif 4", "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif;
+  font-optical-sizing: auto;
+}
