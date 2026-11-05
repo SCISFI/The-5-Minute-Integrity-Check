@@ -162,15 +162,22 @@ const CrisisCheck: React.FC<Props> = ({ onSwitchToOriginal }) => {
 
   if (phase === 'landing') {
     return (
-      <div className="space-y-8 animate-in fade-in duration-500">
-        <div className="space-y-3">
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 leading-tight">
-            Caught Again? Start Here
+      <div className="animate-in fade-in duration-700">
+        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-quiet">SC-IFSI</p>
+
+        <div className="mt-7">
+          <h1 className="font-source-serif text-[2.05rem] md:text-[2.7rem] font-medium tracking-[-0.02em] text-ink leading-[1.15]">
+            Caught Again? Start&nbsp;Here
           </h1>
-          <p className="text-lg text-gray-600 font-light">The First 24 Hours Integrity Check</p>
+          <p className="mt-3 text-lg font-light text-quiet leading-snug">
+            The First 24 Hours Integrity Check
+          </p>
+          <p className="mt-5 text-[12.5px] leading-relaxed tracking-[0.01em] text-quiet">
+            About 5 minutes · Private — stays in this browser
+          </p>
         </div>
 
-        <div className="space-y-4 text-sm text-gray-600 leading-relaxed">
+        <div className="mt-10 space-y-5 text-[17px] leading-[1.65] text-body">
           <p>
             You may feel panic, shame, anger, fear, or the urge to explain. This is not the moment
             to perform, defend, bargain, minimize, or make big promises.
@@ -181,24 +188,30 @@ const CrisisCheck: React.FC<Props> = ({ onSwitchToOriginal }) => {
           </p>
         </div>
 
-        <div className="bg-red-50 border-l-4 border-red-600 p-4 text-sm text-gray-800 leading-relaxed">
+        <div
+          role="note"
+          className="mt-9 border-l-4 border-notice-rule bg-notice px-5 py-4 text-[15px] md:text-base leading-relaxed text-notice-ink"
+        >
           This is not emergency counseling. If anyone is unsafe, at risk of self-harm, being
           threatened, or in immediate danger, contact emergency support now.
         </div>
 
-        <button
-          onClick={() => go('guardrails')}
-          className="w-full bg-black text-white py-4 rounded font-bold uppercase tracking-widest hover:bg-gray-900 transition-colors"
-        >
-          Begin the Check
-        </button>
-
-        <button
-          onClick={onSwitchToOriginal}
-          className="block w-full text-center text-xs text-gray-400 hover:text-black underline tracking-wide pt-2"
-        >
-          Not in crisis? Take the original 5-Minute Integrity Check.
-        </button>
+        <div className="mt-9 space-y-5">
+          <button
+            type="button"
+            onClick={() => go('guardrails')}
+            className="w-full cursor-pointer bg-ink text-paper py-4 rounded text-[15px] font-medium hover:bg-[#3a332e] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+          >
+            Begin the Check
+          </button>
+          <button
+            type="button"
+            onClick={onSwitchToOriginal}
+            className="block w-full cursor-pointer text-center text-sm text-quiet hover:text-ink underline underline-offset-4 decoration-[#cfc6ba] hover:decoration-ink transition-colors"
+          >
+            Not in crisis? Take the original 5-Minute Integrity Check.
+          </button>
+        </div>
       </div>
     );
   }
