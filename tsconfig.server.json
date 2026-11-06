@@ -9,5 +9,5 @@
     "esModuleInterop": true,
     "strict": false
   },
-  "include": ["server/**/*", "services/resultsEmail.ts", "services/protocolHandoff.ts", "types.ts"]
+  "include": ["server/**/*", "services/resultsEmail.ts", "services/protocolHandoff.ts", "services/halPlittCallout.ts", "types.ts"]
 }

@@ -1,4 +1,5 @@
 import type { AssessmentData } from "../types.js";
+import { buildHalPlittCalloutHtml } from "./halPlittCallout.js";
 import { buildProtocolHandoff, handoffParagraphs } from "./protocolHandoff.js";
 
 function escapeHtml(value: string): string {
@@ -115,6 +116,7 @@ export function buildResultsEmailHtml(
               <p style="margin:16px 0 0 0;font-size:12px;color:#9ca3af;">${escapeHtml(handoff.priceLine)} You can change the program before you create the account.</p>
             </td></tr>
           </table>
+          ${buildHalPlittCalloutHtml()}
         </td></tr>
         <tr><td style="padding:24px;text-align:center;">
           <p style="margin:0 0 4px 0;font-size:11px;color:#9ca3af;letter-spacing:0.1em;text-transform:uppercase;">Sent only to you</p>
