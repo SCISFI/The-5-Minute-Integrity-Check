@@ -3,6 +3,7 @@ import { CrisisData } from '../types';
 import CrisisResources from './CrisisResources';
 import { getStabilizingMemo, hasHighRisk } from '../services/crisisSummary';
 import { OFFER_LINE, PRICE_AFTER_TRIAL, signupUrlFor } from '../services/protocolHandoff';
+import HalPlittCallout from './HalPlittCallout';
 
 interface Props {
   onSwitchToOriginal: () => void;
@@ -310,6 +311,8 @@ const CrisisCheck: React.FC<Props> = ({ onSwitchToOriginal }) => {
             Both open the signup page. No credit card on that page. You can change the program before you create the account.
           </p>
         </div>
+
+        <HalPlittCallout />
 
         <div className="text-center text-sm text-gray-500 italic border-t border-gray-100 pt-6 space-y-2">
           <p>&ldquo;The first faithful step is not to repair your image. It is to come into the light.&rdquo;</p>

@@ -3,6 +3,7 @@ import { AssessmentData } from '../types';
 import { getClarityInsight } from '../services/geminiService';
 import { sendResultsEmail } from '../services/emailService';
 import { buildProtocolHandoff } from '../services/protocolHandoff';
+import HalPlittCallout from './HalPlittCallout';
 
 interface Props {
   data: AssessmentData;
@@ -117,6 +118,8 @@ const FinalCTA: React.FC<Props> = ({ data, email, firstName }) => {
         <p className="text-center text-xs text-gray-500 -mt-2">
           Opens the signup page with {handoff.trackName} selected. You can change the program, then choose a mentor and set a password. No credit card on that page.
         </p>
+
+        <HalPlittCallout />
 
         {email && !loading && (
           <button
